@@ -19,6 +19,9 @@ class _NewTransactionState extends State<NewTransaction> {
     if (_amountController.text.isEmpty) {
       return;
     }
+    if (_selectedDate == null) {
+      return;
+    }
     String title = _titleController.text;
     double price = double.parse(_amountController.text);
 
