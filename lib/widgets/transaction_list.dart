@@ -11,10 +11,11 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      child: userTransactions.isEmpty
-          ? Column(
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    return userTransactions.isEmpty
+        ? LayoutBuilder(builder: (ctx, constraints) {
+            return Column(
               children: <Widget>[
                 Text(
                   'No Transaction added!!',
@@ -24,53 +25,65 @@ class TransactionList extends StatelessWidget {
                   height: 10,
                 ),
                 Container(
-                  height: 200,
+                  height: constraints.maxHeight * 0.6,
                   child: Image.asset(
                     'asset/images/waiting.png',
                     fit: BoxFit.cover,
                   ),
                 )
               ],
-            )
-          : ListView.builder(
-              itemBuilder: (ctx, index) {
-                return Card(
-                  margin: EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 5,
-                  ),
-                  elevation: 6,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: FittedBox(
-                          child: Text('\$${userTransactions[index].amount}'),
-                        ),
+            );
+          })
+        : ListView.builder(
+            itemBuilder: (ctx, index) {
+              return Card(
+                margin: EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 5,
+                ),
+                elevation: 6,
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: FittedBox(
+                        child: Text('\$${userTransactions[index].amount}'),
                       ),
                     ),
-                    title: Text(
-                      '${userTransactions[index].title}',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMd()
-                          .format(userTransactions[index].date)
-                          .toString(),
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () {
-                        deleteTx(userTransactions[index].id);
-                      },
-                    ),
                   ),
-                );
-              },
-              itemCount: userTransactions.length,
-            ),
-    );
+                  title: Text(
+                    '${userTransactions[index].title}',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  subtitle: Text(
+                    DateFormat.yMMMd()
+                        .format(userTransactions[index].date)
+                        .toString(),
+                  ),
+                  trailing: MediaQuery.of(context).size.width > 450
+                      ? TextButton.icon(
+                          onPressed: () {
+                            deleteTx(userTransactions[index].id);
+                          },
+                          icon: Icon(Icons.delete),
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red),
+                          ),
+                          label: Text('Delete'),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: Theme.of(context).errorColor,
+                          onPressed: () {
+                            deleteTx(userTransactions[index].id);
+                          },
+                        ),
+                ),
+              );
+            },
+            itemCount: userTransactions.length,
+          );
   }
 }
